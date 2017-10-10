@@ -1,37 +1,14 @@
 (function () {
-  var canvas = document.createElement("canvas"), //画布
-    config = get_config_option(), //配置
-    canvas_id = "c_n" + config.l, //canvas id
-    ctx = canvas.getContext("2d"), canvas_width, canvas_height,
-    frame_func = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (func) {
-        window.setTimeout(func, 1000 / 60);
-      };
-  canvas.id = canvas_id;
-  canvas.style.cssText = "position:fixed;top:0;left:0;z-index:" + config.z + ";opacity:" + config.o + ";background-color:rgba(" + config.c + ")" ;
-  var mousePosition = {
-    x: 30 * canvas.width / 100,
-    y: 30 * canvas.height / 100
-  };
-
-  //将canvas标签添加到html中
-  get_by_tagname("body")[0].appendChild(canvas);
-
-  //设置canvas的高宽
-  function set_canvas_size() {
-    canvas_width = canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    canvas_height = canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-  }
-  //初始化画布大小
-  set_canvas_size();
-  window.onresize = set_canvas_size;
   //封装方法，压缩之后减少文件大小
   function get_attribute(node, attr, default_value) {
     return node.getAttribute(attr) || default_value;
   }
+
   //封装方法，压缩之后减少文件大小
   function get_by_tagname(name) {
     return document.getElementsByTagName(name);
   }
+
   //获取配置参数
   function get_config_option() {
     var scripts = get_by_tagname("script"),
@@ -45,7 +22,36 @@
     };
   }
 
-  ctx.lineWidth = .3;
+  //创建canvas标签
+  var canvas = document.createElement("canvas"), //画布
+    config = get_config_option(), //配置
+    canvas_id = "c_n" + config.l, //canvas id
+    ctx = canvas.getContext("2d"), canvas_width, canvas_height,
+    frame_func = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (func) {
+        window.setTimeout(func, 1000 / 60);
+      };
+  canvas.id = canvas_id;
+  canvas.style.cssText = "position:fixed;top:0;left:0;z-index:" + config.z + ";opacity:" + config.o + ";background-color:rgba(" + config.c + ")";
+
+  //将canvas标签添加到html中
+  get_by_tagname("body")[0].appendChild(canvas);
+
+  //设置canvas的高宽
+  function set_canvas_size() {
+    canvas_width = canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    canvas_height = canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  }
+
+  //初始化画布大小
+  set_canvas_size();
+  window.onresize = set_canvas_size;
+
+  var mousePosition = {
+    x: 30 * canvas.width / 100,
+    y: 30 * canvas.height / 100
+  };
+
+  ctx.lineWidth = 0.3;
   ctx.strokeStyle = (new Color(150)).style;
 
   var dots = {
@@ -59,7 +65,7 @@
     return Math.floor(Math.random() * 255 + min);
   }
 
-  function createColorStyle(r,g,b) {
+  function createColorStyle(r, g, b) {
     return 'rgba(' + r + ',' + g + ',' + b + ', 0.8)';
   }
 
@@ -85,7 +91,7 @@
     this.style = createColorStyle(this.r, this.g, this.b);
   }
 
-  function Dot(){
+  function Dot() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
 
@@ -99,7 +105,7 @@
   }
 
   Dot.prototype = {
-    draw: function(){
+    draw: function () {
       ctx.beginPath();
       ctx.fillStyle = this.color.style;
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -107,23 +113,23 @@
     }
   };
 
-  function createDots(){
-    for(var i = 0; i < dots.nb; i++){
+  function createDots() {
+    for (var i = 0; i < dots.nb; i++) {
       dots.array.push(new Dot());
     }
   }
 
   function moveDots() {
-    for(var i = 0; i < dots.nb; i++){
+    for (var i = 0; i < dots.nb; i++) {
 
       var dot = dots.array[i];
 
-      if(dot.y < 0 || dot.y > canvas.height){
+      if (dot.y < 0 || dot.y > canvas.height) {
         dot.vx = dot.vx;
-        dot.vy = - dot.vy;
+        dot.vy = -dot.vy;
       }
-      else if(dot.x < 0 || dot.x > canvas.width){
-        dot.vx = - dot.vx;
+      else if (dot.x < 0 || dot.x > canvas.width) {
+        dot.vx = -dot.vx;
         dot.vy = dot.vy;
       }
       dot.x += dot.vx;
@@ -132,13 +138,13 @@
   }
 
   function connectDots() {
-    for(var i = 0; i < dots.nb; i++){
-      for(var j = 0; j < dots.nb; j++){
+    for (var i = 0; i < dots.nb; i++) {
+      for (var j = 0; j < dots.nb; j++) {
         var i_dot = dots.array[i];
         var j_dot = dots.array[j];
 
-        if((i_dot.x - j_dot.x) < dots.distance && (i_dot.y - j_dot.y) < dots.distance && (i_dot.x - j_dot.x) > - dots.distance && (i_dot.y - j_dot.y) > - dots.distance){
-          if((i_dot.x - mousePosition.x) < dots.d_radius && (i_dot.y - mousePosition.y) < dots.d_radius && (i_dot.x - mousePosition.x) > - dots.d_radius && (i_dot.y - mousePosition.y) > - dots.d_radius){
+        if ((i_dot.x - j_dot.x) < dots.distance && (i_dot.y - j_dot.y) < dots.distance && (i_dot.x - j_dot.x) > -dots.distance && (i_dot.y - j_dot.y) > -dots.distance) {
+          if ((i_dot.x - mousePosition.x) < dots.d_radius && (i_dot.y - mousePosition.y) < dots.d_radius && (i_dot.x - mousePosition.x) > -dots.d_radius && (i_dot.y - mousePosition.y) > -dots.d_radius) {
             ctx.beginPath();
             ctx.strokeStyle = averageColorStyles(i_dot, j_dot);
             ctx.moveTo(i_dot.x, i_dot.y);
@@ -152,7 +158,7 @@
   }
 
   function drawDots() {
-    for(var i = 0; i < dots.nb; i++){
+    for (var i = 0; i < dots.nb; i++) {
       var dot = dots.array[i];
       dot.draw();
     }
@@ -176,10 +182,9 @@
     mousePosition.x = canvas.width / 2;
     mousePosition.y = canvas.height / 2;
   };
+
   createDots();
-  setTimeout(function() {
+  setTimeout(function () {
     frame_func(animateDots);
   }, 100);
-
-
 })();
